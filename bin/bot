@@ -3,7 +3,7 @@
 require 'bundler'
 require './lib/boot'
 
-TOKEN = 'REPLACE_ME'
+TOKEN = ENV['TOKEN']
 
 logger = Logger.new(STDOUT)
 
