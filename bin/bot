@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require 'bundler'
+require './lib/boot'
+
+TOKEN = 'REPLACE_ME'
+
+logger = Logger.new(STDOUT)
+
+Telegram::Bot::Client.run(TOKEN) do |bot|
+  logger.debug "Starting the server..."
+
+  lobby = Lobby.new(bot.api)
+
+  bot.listen do |message|
+    logger.debug "@#{message.from.username}: #{message.inspect}"
+    case message
+    when Telegram::Bot::Types::CallbackQuery
+      lobby.move(message.message.chat.id, message.message.message_id, message.data)
+    when Telegram::Bot::Types::Message
+      case message.text
+      when "/start"
+        lobby.start_game(message.chat.id)
+      else
+        bot.api.send_message(chat_id: message.chat.id, text: "Send /start to play a game.")
+      end
+    end
+  end
+end
